@@ -22,38 +22,38 @@ const links=[
     title: "Home",
     label: "128",
     icon: Home,
-    variant: "default",
+    variant: "zinc",
   },
   {
     title: "Explore",
     label: "9",
     icon: Search,
-    variant: "default",
+    variant: "zinc",
   },
   {
     title: "Rewards",
     label: "",
     icon: Percent,
-    variant: "default",
+    variant: "zinc",
   },
   {
     title: "Transfer",
     label: "23",
     icon: ArrowRightLeft,
-    variant: "default",
+    variant: "zinc",
   },
   {
     title: "Transaction",
     label: "",
     icon: Clock,
-    variant: "default",
+    variant: "zinc",
   },
 ];
 export function Sidebar({isCollapsed }: NavProps) {
   return (
     <div
       data-collapsed={isCollapsed}
-      className="group w-[10vw] h-[100vh] flex flex-col gap-4 py-2 data-[collapsed=true]:py-2"
+      className="group bg-zinc-900 w-[13vw] h-[100vh] flex flex-col gap-4 py-2 data-[collapsed=true]:py-2"
     >
       <nav className="grid gap-1 px-2 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-2">
         {links.map((link, index) =>

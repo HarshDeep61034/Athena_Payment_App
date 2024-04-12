@@ -1,6 +1,7 @@
 import db from "@repo/db/client";
 import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcrypt";
+import { redirect } from "next/dist/server/api-utils";
 
 export const authOptions = {
     providers: [
@@ -20,36 +21,20 @@ export const authOptions = {
                 }
             });
 
-            if (existingUser) {
-                const passwordValidation = await bcrypt.compare(credentials.password, existingUser.password);
-                if (passwordValidation) {
-                    return {
-                        id: existingUser.id.toString(),
-                        name: existingUser.name,
-                        email: existingUser.number
-                    }
-                }
-                return null;
-            }
-
-            try {
-                const user = await db.user.create({
-                    data: {
-                        number: credentials.phone,
-                        password: hashedPassword
-                    }
-                });
-            
+            if (!existingUser) {
                 return {
-                    id: user.id.toString(),
-                    name: user.name,
-                    email: user.number
+                    msg: "User not found"
                 }
-            } catch(e) {
-                console.error(e);
             }
 
-            return null
+            const passwordValidation = await bcrypt.compare(credentials.password, existingUser.password);
+            if (passwordValidation) {
+                return {
+                    id: existingUser.id.toString(),
+                    name: existingUser.name,
+                    number: existingUser.number
+                }
+            }
           },
         })
     ],

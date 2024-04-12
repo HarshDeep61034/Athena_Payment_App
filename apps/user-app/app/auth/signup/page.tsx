@@ -35,7 +35,7 @@ export default function AuthenticationPage() {
     });
   
     if (!response?.error) {
-      Router.push('/dashboard');
+      Router.push('/dashboard/home');
     }
 //   console.log(res);
     // setTimeout(() => {

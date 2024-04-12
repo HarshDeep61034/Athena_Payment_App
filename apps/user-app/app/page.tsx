@@ -8,7 +8,16 @@ import { Input } from "@repo/ui/components/ui/input"
 import { Button } from "@repo/ui/components/ui/button"
 import Image from "next/image"
 import debit from "./assets/debit.png"
-export default function Component() {
+import { getServerSession } from "next-auth"
+import { redirect } from "next/dist/server/api-utils"
+import { authOptions } from "../lib/auth"
+export default async function Component(req: any, res: any) {
+  // const session = await getServerSession(authOptions);
+  // if (session?.user) {
+  //   res.redirect('/dashboard/home');
+  // } else {
+  //   res.redirect('/auth/signin');
+  // }
   return (
     <div className="flex flex-col bg-[] min-h-[100dvh]">
       <header className="px-4 lg:px-6 h-14 flex items-center">
