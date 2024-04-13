@@ -1,3 +1,4 @@
+"use client"
 import * as React from "react"
 import {
     Table,
@@ -10,75 +11,6 @@ import {
     TableRow,
   } from "@repo/ui/components/ui/table"
   import { ScrollArea } from "@repo/ui/components/ui/scroll-area"
-
-  
-  const invoices = [
-    {
-      invoice: "INV001",
-      paymentStatus: "Paid",
-      totalAmount: "$250.00",
-      paymentMethod: "Credit Card",
-    },
-    {
-      invoice: "INV002",
-      paymentStatus: "Pending",
-      totalAmount: "$150.00",
-      paymentMethod: "PayPal",
-    },
-    {
-      invoice: "INV003",
-      paymentStatus: "Unpaid",
-      totalAmount: "$350.00",
-      paymentMethod: "Bank Transfer",
-    },
-    {
-      invoice: "INV004",
-      paymentStatus: "Paid",
-      totalAmount: "$450.00",
-      paymentMethod: "Credit Card",
-    },
-    {
-      invoice: "INV005",
-      paymentStatus: "Paid",
-      totalAmount: "$550.00",
-      paymentMethod: "PayPal",
-    },
-    {
-      invoice: "INV006",
-      paymentStatus: "Pending",
-      totalAmount: "$200.00",
-      paymentMethod: "Bank Transfer",
-    },
-    {
-      invoice: "INV007",
-      paymentStatus: "Unpaid",
-      totalAmount: "$300.00",
-      paymentMethod: "Credit Card",
-    },
-    {
-        invoice: "INV006",
-        paymentStatus: "Pending",
-        totalAmount: "$200.00",
-        paymentMethod: "Bank Transfer",
-      },
-      {
-        invoice: "INV007",
-        paymentStatus: "Unpaid",
-        totalAmount: "$300.00",
-        paymentMethod: "Credit Card",
-      }, {
-        invoice: "INV006",
-        paymentStatus: "Pending",
-        totalAmount: "$200.00",
-        paymentMethod: "Bank Transfer",
-      },
-      {
-        invoice: "INV007",
-        paymentStatus: "Unpaid",
-        totalAmount: "$300.00",
-        paymentMethod: "Credit Card",
-      },
-  ]
   
 import { Button } from "@repo/ui/components/ui/button"
 import {
@@ -98,10 +30,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/ui/select"
-
-
+import Link from "next/link"
+import axios from "axios"
+import { useRouter } from "next/navigation"
   
 export default function Page() {
+  const [trxn, setTrxn] = React.useState([]);
+  const [amount, setAmount] = React.useState(0);
+  const router = useRouter();
+  async function handleAddMoney(){
+    const res = await axios.post("/api/transaction", {amount});
+    if(res.data.token != undefined){
+      router.push(`http://localhost:3002?token=${res.data.token}`);
+    }
+  }
+
+  React.useEffect(() => {
+    async function getOnRampTransactions() {
+        try {
+            const res = await axios.get("/api/transaction");
+            const trans = res.data.reverse();
+          setTrxn(trans); // Using functional form of setTrxn
+        } catch (error) {
+            console.error("Error fetching transactions:", error);
+        }
+    }
+    getOnRampTransactions();
+}, []);
   return (
     <main className="bg-zinc-100 w-full">
       <div>
@@ -118,7 +73,7 @@ export default function Page() {
           <div className="grid w-full items-center gap-4">
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="amount">Amount</Label>
-              <Input id="amount" type="number" placeholder="Amount in $" />
+              <Input id="amount" onChange={(e)=>setAmount(e.target.value)} type="number" placeholder="Amount in $" />
             </div>
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="Bank">Bank</Label>
@@ -138,7 +93,7 @@ export default function Page() {
         </form>
       </CardContent>
       <CardFooter className="flex w-full justify-center">
-        <Button>Add Money</Button>
+        <Button onClick={handleAddMoney}>Add Money</Button>
       </CardFooter>
     </Card>
     </div>
@@ -167,31 +122,25 @@ export default function Page() {
             
         <ScrollArea className="h-[400px] my-4 bg-white p-4 rounded-lg border">
        <Table>
-        <TableCaption>A list of your recent invoices.</TableCaption>
+        <TableCaption>A list of your recent Transactions.</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[100px]">Invoice</TableHead>
+            <TableHead className="w-[100px]">Date</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Method</TableHead>
+            <TableHead>Transaction Id</TableHead>
             <TableHead className="text-right">Amount</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {invoices.map((invoice) => (
-            <TableRow key={invoice.invoice}>
-              <TableCell className="font-medium">{invoice.invoice}</TableCell>
-              <TableCell>{invoice.paymentStatus}</TableCell>
-              <TableCell>{invoice.paymentMethod}</TableCell>
-              <TableCell className="text-right">{invoice.totalAmount}</TableCell>
+          {trxn.length > 0 ? trxn.reverse().map((tr, index) => (
+            <TableRow key={index}>
+              <TableCell className="font-medium">{tr.startTime.slice(0,10)}</TableCell>
+              <TableCell>{tr.status}</TableCell>
+              <TableCell>{tr.token.slice(0, 14) + "..."}</TableCell>
+              <TableCell className="text-right">{tr.amount}</TableCell>
             </TableRow>
-          ))}
+          )) : "No Transactions Yet!!"}
         </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TableCell colSpan={3}>Total</TableCell>
-            <TableCell className="text-right">$2,500.00</TableCell>
-          </TableRow>
-        </TableFooter>
       </Table>
 
 </ScrollArea>
